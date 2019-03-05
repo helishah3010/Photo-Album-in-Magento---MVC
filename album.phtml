@@ -1,0 +1,25 @@
+<?php 
+echo $this->getMessagesBlock()->getGroupedHtml();
+$write = Mage::getSingleton('core/resource')->getConnection('core_write');
+$email = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
+$user_id=Mage::getModel('userprofile/customersettings')->SetCustomerDetail($email);
+$userdefultdetails=Mage::getModel('userprofile/customersettings')->getdefalutcustomerdetails($email);
+$basepath=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+?>
+<script>
+jQuery(document).ready(function(){
+var uid = '<?php echo $user_id;?>';
+var email = '<?php echo $email;?>';
+var mainuserid = jQuery('#mymainmenu .dd-selected-value').val();
+jQuery("#loadalbum").load('<?php echo $basepath; ?>Album/showalbum.php?identityid='+mainuserid+'&user_id='+uid+'&email='+email,
+			function(response, status, xhr) {
+					
+			  if (status == "error") {
+				jQuery("#loadalbum").html(msg + xhr.status + " " + xhr.statusText);
+			  }
+	});
+});	
+</script>	
+<div id="loadalbum" class="common_width">
+
+</div>	
