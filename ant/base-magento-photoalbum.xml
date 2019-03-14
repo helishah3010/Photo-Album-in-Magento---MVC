@@ -1,0 +1,38 @@
+<project name="base-magento-photoalbum" basedir="." default="*install">
+    <property file="${basedir}/../../core-magento/ant/properties/config-magento" />
+    <import file="${basedir}/../../core-sohyper-lib/ant/templates/_common.xml" />
+    <import file="${workspacedir}/core-magento/ant/templates/_target-magento.xml" optional="true" />
+    <!--*********************************************************************************************************** -->
+    <!-- Recursive checkout/deploy -->
+    <!--*********************************************************************************************************** -->
+    <target name="*checkout" depends="modules-git" />
+    <target name="*deploy" depends="modules-deploy, *install">
+        <antcall target="xml-build-list" />
+    </target>
+    <!--*********************************************************************************************************** -->
+    <!-- Install module -->
+    <!--*********************************************************************************************************** -->
+    <target name="*install">
+        <antcall target="photoalbum-db" />
+        <antcall target="photoalbum-src" />
+    </target>
+    <target name="photoalbum-db" depends="test-db">
+        <sql driver="${sql.driver}" url="${sql.url}" userid="${sql.user}" password="${sql.pass}">
+            <classpath>
+                <pathelement location="${mysql.connector.driver}" />
+            </classpath>
+            <transaction src="${projectdir}/db/mysql/magento/photoalbum.sql" />
+        </sql>
+    </target>
+    <target name="photoalbum-src" depends="test-src">
+        <copy overwrite="true" force="true" verbose="true" todir="${local.deploydir}/app">
+            <fileset dir="${projectdir}/app" />
+        </copy>
+        <copy overwrite="true" force="true" verbose="true" todir="${local.deploydir}/js">
+            <fileset dir="${projectdir}/js" />
+        </copy>
+        <copy overwrite="true" force="true" verbose="true" todir="${local.deploydir}/album">
+            <fileset dir="${projectdir}/album" />
+        </copy>
+    </target>
+</project>

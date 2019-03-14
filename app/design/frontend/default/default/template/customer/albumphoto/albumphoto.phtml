@@ -1,0 +1,83 @@
+<?php
+/*
+ * @todo: in clean up process; removing unused code
+ */
+echo $this->getMessagesBlock()->getGroupedHtml();
+$getDatabaseConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+$userIdentity = $_REQUEST['user_id'];
+$identityId = $_REQUEST['identity_id'];
+$userEmail = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
+$userDefaultDetails=Mage::getModel('userprofile/customersettings')->getdefalutcustomerdetails($userEmail);
+$basePath=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+$albumId = $_REQUEST['aid'];
+?>
+<script src="<?php echo $basePath;?>js/kendoui/js/jquery.min.js"></script>
+<link href="<?php echo $basePath;?>js/kendoui/styles/kendo.common.min.css" rel="stylesheet" />
+<link href="<?php echo $basePath;?>js/kendoui/styles/kendo.rtl.min.css" rel="stylesheet" />
+<link href="<?php echo $basePath;?>js/kendoui/styles/kendo.silver.min.css" rel="stylesheet" />
+<script src="<?php echo $basePath;?>js/kendoui/js/kendo.all.min.js"></script>
+<html>
+<body>
+<div class="demo">
+  <div class="fieldset">
+  <?php echo $this->getBlockHtml('formkey');
+  if(isset($_GET['action']) && $_GET['action'] == 'edit') {
+  ?>
+	<h2 class="legend"><?php echo $this->__('Edit Album') ?></h2>
+    <form name="editFormName" id="editFormName" action="<?php echo $basePath.'Album/updatealbum.php?aid='.$albumId;?>" method="post">
+      <input type="hidden" name="email" id="email" value="<?php echo $userEmail; ?>"/>
+      <input type="hidden" name="identity" class="identity" value="<?php echo $identityId; ?>" />
+	  <table border="0" width="100%">
+	    <?php
+	    $albumData=Mage::getModel("customer/photoalbum")->fetchAlbumData($userIdentity, $albumId, $identityId);
+	    while($albumDetails = $albumData->fetch()) {
+	    ?>
+	    <tr>
+	      <td align="right" width="20%"><?php echo $this->__('Album Name') ?></td>
+	      <td align="right" width="80%"><input type="text" name="inputAlbumName" value="<?php echo $albumDetails['album_name'];?>"></td>
+	    </tr>
+	    <tr>
+	      <td height="10"></td>
+	    </tr>
+	    <tr>
+	      <td align="right" width="20%"><?php echo $this->__('Photo Description') ?></td>
+	      <td align="right" width="80%"><input type="text" name="inputPhotoDescription" value="<?php echo $albumDetails['photo_description'];?>"></td>
+	    </tr>
+	    <tr>
+	      <td height="10"></td>
+	    </tr>
+	    <tr>
+	      <td align="right" width="20%"><?php echo $this->__('Album Photo') ?></td>
+	      <td align="right"><input type="file" name="uploadPhoto" id="uploadPhoto"></td><td><img src="<?php echo $basePath;?>media/highresolution/<?php echo $albumDetails['album_name'].'/'?><?php echo $albumDetails['album_photo'];?>" width="100" height="100"></td>
+	    </tr>
+	    <tr>
+	      <td height="10"></td>
+	    </tr>
+	    <tr>
+          <td align="right" width="20%"></td>
+          <td width="80%">
+            <button type="submit" title="<?php echo $this->__('Update Album') ?>" class="button"><span><span><?php echo $this->__('Update Album') ?></span></span></button>
+            <a href="<?php echo $this->getAlbumURL()?>"><button type="button" title="<?php echo $this->__('Cancel') ?>" class="button"><span><span><?php echo $this->__('Cancel') ?></span></span></button></a>
+          </td>
+        </tr>
+	    <?php
+		}
+		?>
+	  </table>
+	</form>
+	<script src="<?php echo $basePath;?>js/kendoScript.js"></script>
+  <?php
+  } else {
+    $albumIdentity = $_GET['delid'];
+    $albumImage=Mage::getModel("customer/photoalbum")->updateStatus($albumIdentity);
+	unlink($basePath.'media/highresolution/'.$albumImage['album_name'].'/'.$albumImage['album_photo']);
+	unlink($basePath.'media/lowresolution/'.$albumImage['album_name'].'/'.$albumImage['album_photo']);
+	$deletStatus=Mage::getModel("customer/photoalbum")->deleteAlbum($albumIdentity);
+	header("location:".$basePath."index.php/customer/album/");
+	exit(0);
+  }
+  ?>
+  </div>
+</div>
+</body>
+</html>

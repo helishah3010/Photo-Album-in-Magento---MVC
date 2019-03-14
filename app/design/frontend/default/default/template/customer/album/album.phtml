@@ -1,0 +1,16 @@
+<?php
+echo $this->getMessagesBlock()->getGroupedHtml();
+$getDatabaseConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+$userEmail = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
+$userIdentity=Mage::getModel('userprofile/customersettings')->SetCustomerDetail($userEmail);
+$userDefaultDetails=Mage::getModel('userprofile/customersettings')->getdefalutcustomerdetails($userEmail);
+$basePath=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+$identityId=Mage::getSingleton('core/session')->getIdentityId();
+?>
+<input type="hidden" id="albumUserIdentity" value="<?php echo $userIdentity;?>"/>
+<input type="hidden" id="albumUserEmail" value="<?php echo $userEmail;?>"/>
+<input type="hidden" id="albumIdentityId" value="<?php echo $identityId;?>"/>
+<input type="hidden" id="albumbasePath" value="<?php echo $basePath;?>"/>
+<script src="<?php echo $basePath;?>js/albumScript.js"></script>
+<div id="loadalbum" class="common_width">
+</div>
